@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Propostas Evolver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --ink:#1B2A4E; --muted:#5E6780; --line:#DDE3EE; --ground:#F3F5F9; --panel:#FFFFFF;
+  --field:#FFFFFF; --accent:#058A46; --accent-ink:#FFFFFF; --sun:#F2A81D; --leaf:#2E9A6B; --warn-bg:#FFF4DA; --warn-ink:#7A5200;
+  --ok:#2E9A6B;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ink:#E8ECF5; --muted:#A3ACC2; --line:#2D3650; --ground:#11151F; --panel:#1A2030; --field:#141A28;
+    --accent:#3CCB82; --accent-ink:#0E1422; --warn-bg:#3A2F14; --warn-ink:#F5D48A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ink:#E8ECF5; --muted:#A3ACC2; --line:#2D3650; --ground:#11151F; --panel:#1A2030; --field:#141A28;
+  --accent:#3CCB82; --accent-ink:#0E1422; --warn-bg:#3A2F14; --warn-ink:#F5D48A;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.app{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:20px;padding:20px 16px;max-width:1500px;margin:0 auto}
+@media (max-width:980px){.app{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:14px}
+.brandbar{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brandbar h1{font-family:var(--display);font-weight:800;font-size:26px;margin:0;letter-spacing:-.02em}
+.brandbar span{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:600 14px var(--body);padding:8px 6px;border-radius:7px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font:700 13px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.row{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600}
+input,select,textarea{font:15px var(--body);color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:64px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.svc{display:grid;grid-template-columns:auto 1fr 78px;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.svc:first-of-type{border-top:0}
+.svc .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.svc .val{font-variant-numeric:tabular-nums;text-align:right;font-size:13px;color:var(--muted)}
+.svc .more{grid-column:2 / 4;display:grid;grid-template-columns:120px 1fr;gap:8px}
+.svc input[type=checkbox]{width:18px;height:18px}
+.days{grid-column:1 / 3;display:flex;gap:4px;flex-wrap:wrap}
+.days button{border:1px solid var(--line);background:var(--field);color:var(--muted);font:600 13px var(--body);padding:5px 9px;border-radius:7px;cursor:pointer;min-width:44px}
+.days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.calc{grid-column:1 / 3;font-size:12.5px;color:var(--muted)}
+.chk{flex-direction:row!important;align-items:center;gap:8px;color:var(--ink)!important;font-weight:400!important}
+.chk input{width:18px;height:18px;flex:none}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 14px var(--body);padding:10px 14px;border-radius:9px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:progress}
+.note{background:var(--warn-bg);color:var(--warn-ink);border-radius:9px;padding:10px 12px;font-size:13px}
+.status{font-size:13px;color:var(--muted);min-height:18px}
+.hist{display:flex;flex-direction:column}
+.hist .it{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--line)}
+.hist .it:first-child{border-top:0}
+.hist b{font-size:14px}.hist small{color:var(--muted);font-variant-numeric:tabular-nums}
+.hist button{grid-row:1 / 3;grid-column:2;align-self:center}
+.totals{display:flex;justify-content:space-between;align-items:baseline;font-variant-numeric:tabular-nums}
+.totals strong{font-family:var(--display);font-size:22px}
+.previewWrap{overflow-x:auto;padding-bottom:20px}
+.pages{display:flex;flex-direction:column;align-items:center;gap:18px;transform-origin:top left}
+.pages .page{box-shadow:0 2px 18px rgba(20,30,60,.14)}
+
+/* ============ DOCUMENT (always paper) ============ */
+.page{--p-ink:#1B2A4E;--p-muted:#5E6780;--p-line:#E1E6EF;--p-sky:#E8F7FD;--p-blue:#058A46;--p-sun:#E2A924;--p-red:#EE1D23;--p-green:#06A554;--p-cyan:#00AEEF;--p-soft:#F6F8FB;
+  width:794px;height:1123px;background:#fff;color:var(--p-ink);position:relative;overflow:hidden;font-family:var(--body);font-size:13.5px;line-height:1.55;flex:none}
+.page .in{position:absolute;inset:92px 64px 78px 64px;display:flex;flex-direction:column;gap:18px}
+.phead{position:absolute;top:0;left:0;right:0;height:64px;padding:0 64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--p-line)}
+.phead .meta{font-size:10.5px;color:var(--p-muted);font-variant-numeric:tabular-nums}
+.pfoot{position:absolute;bottom:0;left:0;right:0;height:56px;padding:0 64px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--p-muted);border-top:1px solid var(--p-line)}
+.pfoot b{color:var(--p-blue);font-size:10.5px;letter-spacing:.06em}
+.wm{display:flex;align-items:center;gap:8px}
+.wm .w{font-family:var(--display);font-weight:800;letter-spacing:-.03em;color:var(--p-ink);line-height:1}
+.wm .w i{font-style:normal;color:var(--p-blue)}
+.wm img{display:block;object-fit:contain}
+.wm small{font-size:9.5px;color:var(--p-muted);line-height:1.2;max-width:150px}
+.eyebrow{font:700 11px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--p-blue)}
+.ptitle{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.08;letter-spacing:-.02em;margin:4px 0 0;text-wrap:balance}
+.lead{font-size:15px;color:var(--p-ink);max-width:62ch}
+.page p{margin:0}
+.muted{color:var(--p-muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px}
+.feat h4{font-family:var(--display);font-size:16px;margin:0 0 4px;font-weight:700;display:flex;gap:8px;align-items:center}
+.feat h4 .bar{width:14px;height:4px;border-radius:2px;background:var(--p-sun)}
+.feat p{color:#39455f;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--p-line);border-radius:20px;padding:3px 10px 3px 8px;font-size:12px;font-weight:600;background:#fff}
+.quote{background:var(--p-sky);border-radius:14px;padding:18px 22px;font-family:var(--display);font-size:19px;line-height:1.3;font-weight:700;color:var(--p-ink)}
+.quote small{display:block;font-family:var(--body);font-weight:400;font-size:12px;color:var(--p-muted);margin-top:6px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:12px 0;position:relative}
+.step .n{width:34px;height:34px;border-radius:50%;background:var(--c,var(--p-blue));color:#fff;font:800 15px var(--display);display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.step:not(:last-child)::before{content:"";position:absolute;left:16px;top:46px;bottom:-12px;width:2px;background:var(--p-line)}
+.step h4{margin:4px 0 2px;font:700 15.5px var(--display)}
+.step p{font-size:13px;color:#39455f}
+.comm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.comm div{background:var(--p-soft);border-radius:12px;padding:14px 16px}
+.comm h4{margin:0 0 4px;font:700 14.5px var(--display)}
+.comm p{font-size:12.5px;color:#39455f}
+table.t{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.t th{background:var(--p-ink);color:#fff;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:8px 10px;font-weight:700}
+.t td{padding:9px 10px;border-bottom:1px solid var(--p-line);font-size:13px;vertical-align:top}
+.t .r{text-align:right;white-space:nowrap}.t .c{text-align:center}
+.t tr.sub td{background:var(--p-soft);font-weight:700}
+.t tr.tot td{background:var(--p-sky);font-weight:800;font-size:14.5px}
+.t td small{display:block;color:var(--p-muted);font-size:11.5px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--p-line);border-radius:12px;overflow:hidden}
+.kv div{padding:10px 14px;border-right:1px solid var(--p-line);border-bottom:1px solid var(--p-line)}
+.kv div:nth-child(3n){border-right:0}
+.kv span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted);font-weight:700}
+.kv b{font-size:13.5px}
+.box{background:var(--p-soft);border-radius:12px;padding:14px 18px;font-size:12.5px}
+.box ol,.box ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.sec{font-family:var(--display);font-weight:700;font-size:18px;margin:0}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:auto;padding-top:30px}
+.sign div{border-top:1.5px solid var(--p-ink);padding-top:6px;font-size:12px}
+.sign span{color:var(--p-muted);display:block}
+/* cover */
+.cover .band{position:absolute;inset:0 0 auto 0;height:640px;background:var(--p-sky);overflow:hidden}
+.cover .inC{position:absolute;inset:56px 64px 56px 64px;display:flex;flex-direction:column}
+.cover .growth{position:absolute;right:64px;bottom:0;display:flex;align-items:flex-end;gap:14px}
+.cover .growth i{display:block;width:44px;border-radius:22px 22px 0 0}
+.cover h1{font-family:var(--display);font-weight:800;font-size:58px;line-height:1;letter-spacing:-.03em;margin:150px 0 0;max-width:430px}
+.cover .for{margin-top:18px;font-size:17px;max-width:360px}
+.cover .meta{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;border-top:2px solid var(--p-ink);padding-top:14px;font-variant-numeric:tabular-nums}
+.cover .meta span{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--p-muted);font-weight:700}
+.cover .meta b{font-size:14px}
+.cover .toc{position:absolute;top:640px;left:0;right:0;padding-top:44px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cover .toc div{border-left:3px solid var(--p-sun);padding-left:12px;font-size:12.5px;color:#39455f}
+.cover .toc b{display:block;font-family:var(--display);font-size:14.5px;color:var(--p-ink);margin-bottom:2px}
+.cover .tag{margin-top:40px;font-size:12px;color:var(--p-muted)}
+#exportHost{position:fixed;left:-20000px;top:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.gate{position:fixed;inset:0;background:var(--ground);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.gate .card{width:100%;max-width:380px}
+.gate img{width:200px;max-width:100%;align-self:center}
+.who{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.who button{border:0;background:none;color:var(--accent);font:600 13px var(--body);cursor:pointer;padding:0}
+</style>
+</head>
+<body>
+<div class="gate" id="gate" hidden>
+  <form class="card" id="gateForm">
+    <img id="gateLogo" alt="Evolver">
+    <h2>Acesso da equipe</h2>
+    <label>Código de acesso<input id="gateCode" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit" id="gateBtn">Entrar</button>
+    <div class="status" id="gateStatus" role="status"></div>
+  </form>
+</div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brandbar"><h1>Propostas Evolver</h1><span>Gerador de proposta de plano terapêutico</span></div>
+    <div class="who"><span id="whoTxt">Equipe</span> · <button type="button" id="bLogout">Sair</button></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-nova" aria-selected="true" data-t="nova">Nova proposta</button>
+      <button role="tab" id="tab-hist" aria-selected="false" data-t="hist">Histórico</button>
+      <button role="tab" id="tab-cfg" aria-selected="false" data-t="cfg">Configurações</button>
+    </div>
+
+    <section data-panel="nova" class="side">
+      <div class="note" id="exNote">Valores de exemplo. Cadastre os preços reais em <b>Configurações</b> — ficam salvos para toda a equipe.</div>
+      <div class="card">
+        <h2>Família e criança</h2>
+        <div class="row">
+          <label>Nome da criança<input id="f-crianca" autocomplete="off"></label>
+          <label>Idade<input id="f-idade" placeholder="ex.: 4 anos"></label>
+        </div>
+        <label>Responsável<input id="f-resp"></label>
+        <div class="row">
+          <label>WhatsApp<input id="f-tel"></label>
+          <label>E-mail<input id="f-email"></label>
+        </div>
+        <label>Demanda / objetivos combinados (opcional)<textarea id="f-obj" placeholder="Aparece na página da proposta, ex.: ampliar comunicação funcional e autonomia nas rotinas."></textarea></label>
+      </div>
+      <div class="card">
+        <h2>Terapias do plano</h2>
+        <div class="row">
+          <label>Mês de referência<input id="f-mes" type="month"></label>
+          <label>Sem atendimento (só nesta proposta)<input id="f-folgas" placeholder="ex.: 20/10/2026"></label>
+        </div>
+        <p class="status" style="margin:0">Marque os dias da semana de cada terapia. Contamos no máximo 4 sessões por dia da semana e descontamos feriados e recessos.</p>
+        <div id="svcList"></div>
+      </div>
+      <div class="card">
+        <h2>Avaliação e ajustes</h2>
+        <label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="f-aval" style="width:18px;height:18px"> Incluir avaliação inicial (cobrada à parte)</label>
+        <div class="row">
+          <label>Valor da avaliação (R$)<input id="f-avalv" type="number" min="0" step="10"></label>
+          <label>Desconto no mês (R$)<input id="f-desc" type="number" min="0" step="10"></label>
+        </div>
+        <div class="row">
+          <label>Nº da proposta<input id="f-num"></label>
+          <label>Data de emissão<input id="f-data" type="date"></label>
+        </div>
+        <div class="totals"><span id="sumLbl">Investimento no mês</span><strong id="sumTotal">R$ 0,00</strong></div>
+      </div>
+      <div class="btns">
+        <button class="btn primary" id="bPdf">Baixar PDF</button>
+        <button class="btn" id="bSave">Registrar no histórico</button>
+        <button class="btn" id="bNew">Limpar</button>
+      </div>
+      <div class="status" id="status" role="status"></div>
+    </section>
+
+    <section data-panel="hist" class="side" hidden>
+      <div class="card"><h2>Propostas registradas</h2><div class="hist" id="histList"><p class="status">Nenhuma proposta registrada ainda.</p></div></div>
+    </section>
+
+    <section data-panel="cfg" class="side" hidden>
+      <div class="card">
+        <h2>Valor por sessão</h2>
+        <p class="status" style="margin:0">O mês é calculado assim: sessões no calendário × valor da sessão. Dá para mudar o valor em cada proposta.</p>
+        <div id="priceList"></div>
+        <label>Avaliação inicial (R$)<input id="c-aval" type="number" min="0" step="10"></label>
+      </div>
+      <div class="card">
+        <h2>Feriados e recessos</h2>
+        <p class="status" style="margin:0">Feriados nacionais, o estadual (15/08) e o municipal de Belém (08/12) já são descontados automaticamente. Marque os pontos facultativos em que a clínica <b>não atende</b>:</p>
+        <div id="facList" style="display:flex;flex-direction:column;gap:6px"></div>
+        <label>Recessos da clínica (um por linha)<textarea id="c-rec" placeholder="22/12/2026 a 02/01/2027 - Recesso de fim de ano"></textarea></label>
+      </div>
+      <div class="card">
+        <h2>Condições comerciais</h2>
+        <label>Forma de pagamento<textarea id="c-pag"></textarea></label>
+        <label>Vencimento<input id="c-venc"></label>
+        <label>Validade da proposta (dias)<input id="c-valid" type="number" min="1"></label>
+        <label>Condições gerais (uma por linha)<textarea id="c-cond" style="min-height:130px"></textarea></label>
+      </div>
+      <div class="card">
+        <h2>Assinatura e contatos</h2>
+        <div class="row">
+          <label>Assina pela Evolver<input id="c-ass"></label>
+          <label>Cargo<input id="c-cargo"></label>
+        </div>
+        <div class="row">
+          <label>WhatsApp<input id="c-whats"></label>
+          <label>E-mail<input id="c-mail"></label>
+        </div>
+        <label>Endereço<input id="c-end"></label>
+      </div>
+      <p class="status" id="cfgLock" style="margin:0">Só o código de administrador pode salvar configurações.</p>
+      <div class="btns"><button class="btn primary" id="bCfg">Salvar configurações</button></div>
+      <div class="status" id="cfgStatus" role="status"></div>
+    </section>
+  </aside>
+
+  <main class="previewWrap" id="previewWrap"><div class="pages" id="pages"></div></main>
+</div>
+<div id="exportHost"></div>
+
+<script>
+(function(){
+const SERVICES=[
+ {id:"aba",nome:"Psicologia ABA",cor:"#00AEEF",d:"Desenvolvimento de habilidades sociais, comunicativas e acadêmicas com estratégias comportamentais."},
+ {id:"fono",nome:"Fonoaudiologia",cor:"#EE1D23",d:"Fala, linguagem e comunicação, incluindo aspectos de mastigação e deglutição."},
+ {id:"to",nome:"Terapia Ocupacional",cor:"#06A554",d:"Autonomia nas atividades do dia a dia, coordenação motora e processamento sensorial."},
+ {id:"psico",nome:"Psicoterapia",cor:"#E2A924",d:"Regulação emocional e fortalecimento da autoestima."},
+ {id:"musico",nome:"Musicoterapia",cor:"#EE1D23",d:"Expressão emocional e habilidades sociais por meio da música."},
+ {id:"psicoped",nome:"Psicopedagogia",cor:"#E2A924",d:"Intervenção em dificuldades de aprendizagem."},
+ {id:"alim",nome:"Terapia Alimentar",cor:"#06A554",d:"Seletividade alimentar e questões sensoriais ligadas à alimentação."},
+ {id:"is",nome:"Integração Sensorial",cor:"#00AEEF",d:"Organização e regulação das respostas sensoriais."},
+ {id:"psicomot",nome:"Psicomotricidade",cor:"#E2A924",d:"Coordenação motora e consciência corporal."},
+ {id:"neuro",nome:"Avaliação Neuropsicológica",cor:"#1B2A4E",d:"Análise das funções cognitivas.",avulso:true}
+];
+const DEFAULT_CFG={
+  configurado:false,
+  sessaoConfigurado:false,
+  precoSessao:{aba:180,fono:150,to:150,psico:150,musico:130,psicoped:140,alim:150,is:150,psicomot:130,neuro:1800},
+  fac:{carnaval:true,cinzas:false,corpus:true,belem:false,cirio:true,vesperas:true},
+  rec:"",
+  aval:450,
+  pag:"Pix, boleto ou cartão de crédito, conforme escolha no momento da contratação.",
+  venc:"Todo dia 10 de cada mês.",
+  valid:15,
+  cond:["O plano terapêutico tem início após a avaliação inicial.",
+    "Os valores são calculados por sessão: a cada mês contam-se até 4 sessões por dia da semana contratado, descontados feriados e recessos da clínica.",
+    "Após a avaliação e a cada reavaliação, o plano pode ser ajustado; mudanças de frequência geram nova proposta.",
+    "Faltas, reposições e demais regras de atendimento constam no contrato de prestação de serviços.",
+    "Esta proposta não constitui contrato; a contratação se formaliza com a assinatura do contrato."].join("\n"),
+  ass:"Igor Rodrigues", cargo:"Diretor Financeiro",
+  whats:"(91) 98152-6717", mail:"financeiro@evolverbelem.com.br",
+  end:"Travessa Barão do Triunfo, 2733 — Marco, Belém/PA · CEP 66093-050",
+  logo:""
+};
+const LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAD2CAMAAABx98bkAAAAkFBMVEVfX1/p5NkuLi6Ghob4n6Lz26HzXGGo4d5lyJYnsmzsxmvwKzGQ17PpukzmsTZey/Qft/HxPEJHvYL2fYFBu308wPP6vsD+/v4AAAABpFIBAQHkqiLvGyIArO7///+mpqbipRf////////+/v7s6OjHx8f////tDBPY2Nj///8XFxf+/v62trbuExsAnkeWlpbrtfeVAAAAMHRSTlP///7///////////////////////////4A//7///8F//9MMND//q///4//bv////8VH+yKAAA8s0lEQVR4nO2dC1vbSK+Ak9CSUkp3270kLf0MiUMgCZT//++O7blJGkkzYxsIe6LnnP2oY49nNK8lzX2yfD9SVe1/DtvFYlHX9XZ3WK0rc71645y9qLSFW69227or93+t2JO3zkCRVKuWPiD19tDVxn+iLnip4lL/l4r9fgBsPvhdvWCk3q2qjLqoInmVbA+VarlmS71YbFf/BQbfDYCNoqkdgAyutaoQcHsPFFbLlVjqxWK3WhoX/X7l/QC43Ck10doDAUEHWbVerw6H3W67bcKoJo5aV+jn4xSdv/bTa8zgq5YgdiTDNPheAEzWhEWQPmYaLk0Mz/ix7W61Nje9fnnypPG/qVI3CL5GCRKs9efwnQDYlC5ZEw1Ra1wVhj4WPl99NoA8SgabbClZD2VYv6QfJmw1f68bX+Kk+Tv82gfCNwCwj/nWAkAoB1AVbdJxA5JjcL18BSMCSpxb7Gp5yCr1Yle9CIEgn10A08QvNd8O7N85VAYgGwAURATczzkZznDAVrauKtpk15rtQwrMakf3lp7FbmxNZqlbI6g3wUorLVyrXB9kRi52tmFeoMkMAAuNVXgivmhLZD6mbdur2tV8Rnq5NWGrwuCX/VDz2CEnIz2EL3bW23LNficrkl7fSoMEVetDJnpBtocyf6IBGJegagOAxvMf2uZk16A00v6judaGBBWKF8CD3f+s4hJluI9UCxiLCQTXBZVn5JDTniwz+6HYkS2m8SpX6lyzb7K/dC5Qr7QdqDNTaStSad3ffLstS7aHAn8iAQgLYTswmk830xKbjg7fTVolGgP0441rItsVddLG5CXE+nwzzWisEUWrrBdTi33QK6nKa4Hg9OAnbypNiNri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";
+const EMPRESA={razao:"Evolver Centro Terapêutico Ltda",cnpj:"55.208.429/0001-60",site:"www.evolverbelem.com.br",insta:"@evolver.aba"};
+
+let cfg=JSON.parse(JSON.stringify(DEFAULT_CFG));
+/* ====== CONFIGURAÇÃO: cole aqui a URL do App da Web do Google Apps Script ====== */
+const API_URL="https://script.google.com/macros/s/AKfycbxMfBuCLkOGQlJMxIYGKbGy8jDySZZRun-3E6KXvL4fKtaw6-aTzxrk5TpmKG8tEh-DbQ/exec";
+/* ============================================================================= */
+let history=[], isAdmin=false;
+async function api(action,payload){
+  const code=ls.get("ev_code")||"";
+  const r=await fetch(API_URL,{method:"POST",body:JSON.stringify(Object.assign({action,code},payload||{}))});
+  const j=await r.json();if(!j.ok)throw{code:j.error||"erro"};return j;
+}
+const $=id=>document.getElementById(id);
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function fmtDate(iso){if(!iso)return"";const[y,m,d]=iso.split("-");return d+"/"+m+"/"+y}
+function addDays(iso,n){const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+Number(n||0));return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function brl(v){return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function nextNumber(){const y=new Date().getFullYear();let max=0;history.forEach(h=>{const m=/EV-(\d{4})-(\d+)/.exec(h.numero||"");if(m&&+m[1]===y)max=Math.max(max,+m[2])});return "EV-"+y+"-"+String(max+1).padStart(4,"0")}
+
+/* ---------- calendário ---------- */
+const WD=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const WDL=["domingos","segundas-feiras","terças-feiras","quartas-feiras","quintas-feiras","sextas-feiras","sábados"];
+const FAC=[["carnaval","Segunda e terça de Carnaval"],["cinzas","Quarta-feira de Cinzas"],["corpus","Corpus Christi"],["belem","Aniversário de Belém (12/01)"],["cirio","Segunda-feira após o Círio de Nazaré"],["vesperas","Vésperas de Natal e Ano Novo (24 e 31/12)"]];
+function isoD(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+function plus(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function parseDates(txt,out){String(txt||"").split(/\n|;|,(?!\d)/).forEach(line=>{const nm=(line.split(" - ")[1]||"Recesso da clínica").trim();
+  const ds=[...line.matchAll(/(\d{1,2})\/(\d{1,2})\/(\d{4})/g)].map(m=>new Date(+m[3],+m[2]-1,+m[1]));
+  if(ds.length===1)out[isoD(ds[0])]=nm;else if(ds.length>=2){for(let d=ds[0];d<=ds[1];d=plus(d,1))out[isoD(d)]=nm}})}
+function closedDays(y){const E=easter(y),o={};const f=(m,d,n)=>o[isoD(new Date(y,m-1,d))]=n;
+  f(1,1,"Confraternização Universal");f(4,21,"Tiradentes");f(5,1,"Dia do Trabalho");f(8,15,"Adesão do Pará");f(9,7,"Independência do Brasil");
+  f(10,12,"Nossa Senhora Aparecida");f(11,2,"Finados");f(11,15,"Proclamação da República");f(11,20,"Consciência Negra");f(12,8,"Nossa Senhora da Conceição");f(12,25,"Natal");
+  o[isoD(plus(E,-2))]="Sexta-feira Santa";const F=cfg.fac||{};
+  if(F.carnaval){o[isoD(plus(E,-48))]="Carnaval";o[isoD(plus(E,-47))]="Carnaval"}
+  if(F.cinzas)o[isoD(plus(E,-46))]="Quarta-feira de Cinzas";
+  if(F.corpus)o[isoD(plus(E,60))]="Corpus Christi";
+  if(F.belem)f(1,12,"Aniversário de Belém");
+  if(F.cirio){const o1=new Date(y,9,1);const firstSun=plus(o1,(7-o1.getDay())%7);o[isoD(plus(firstSun,8))]="Segunda do Círio"}
+  if(F.vesperas){f(12,24,"Véspera de Natal");f(12,31,"Véspera de Ano Novo")}
+  parseDates(cfg.rec,o);parseDates(P.folgas,o);return o}
+function monthParts(){const m=/^(\d{4})-(\d{2})$/.exec(P.mes||"");if(m)return[+m[1],+m[2]];const d=new Date();d.setMonth(d.getMonth()+1);return[d.getFullYear(),d.getMonth()+1]}
+function monthLabel(){const[y,m]=monthParts();return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"})}
+function nextMonth(){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
+const FREQ2DAYS={1:[2],2:[2,4],3:[1,3,5],4:[1,2,3,4],5:[1,2,3,4,5]};
+function normItem(it){if(!Array.isArray(it.dias))it.dias=(FREQ2DAYS[it.freq]||[2,4]).slice();if(!it.porDia)it.porDia=1;return it}
+function calcItem(s){const it=normItem(P.itens[s.id]);const vs=(it.valor!==""&&it.valor!=null)?Number(it.valor)||0:unitPrice(s.id);
+  if(s.avulso)return{avulso:true,vs,total:vs};
+  const[y,m]=monthParts();const closed=closedDays(y);const per=[];
+  it.dias.slice().sort().forEach(wd=>{const all=[];for(let d=new Date(y,m-1,1);d.getMonth()===m-1;d=plus(d,1))if(d.getDay()===wd)all.push(isoD(d));
+    const excl=all.filter(x=>closed[x]).map(x=>({d:x,nm:closed[x]}));const avail=all.filter(x=>!closed[x]);
+    per.push({wd,all,excl,counted:avail.slice(0,4),five:all.length===5})});
+  const nDates=per.reduce((a,p)=>a+p.counted.length,0);const sess=nDates*it.porDia;
+  return{per,sess,vs,total:sess*vs,padrao:it.dias.length*4*it.porDia*vs,semana:it.dias.length*it.porDia}}
+
+function blankProposal(sample){
+  return {numero:"",data:today(),crianca:sample?"Miguel (exemplo)":"",idade:sample?"4 anos":"",resp:sample?"Ana Souza":"",tel:"",email:"",
+    obj:sample?"Ampliar a comunicação funcional, a interação com outras crianças e a autonomia nas rotinas de casa e da escola.":"",
+    itens:Object.fromEntries(SERVICES.map(s=>[s.id,{on:sample&&["aba","fono","to"].includes(s.id),dias:s.id==="aba"?[1,3,5]:[2,4],porDia:1,valor:"",obs:""}])),
+    aval:true,avalv:"",desc:"",mes:nextMonth(),folgas:""};
+}
+let P=ls.get("ev_draft")||blankProposal(true);if(!P.mes)P.mes=nextMonth();
+
+function unitPrice(id){return Number((cfg.precoSessao||{})[id])||0}
+function lineValue(s){return calcItem(s).total}
+function selected(){return SERVICES.filter(s=>P.itens[s.id]&&P.itens[s.id].on)}
+function totals(){const sel=selected();const mensais=sel.filter(s=>!s.avulso);const avulsos=sel.filter(s=>s.avulso);
+  const C=Object.fromEntries(mensais.map(s=>[s.id,calcItem(s)]));const sub=mensais.reduce((a,s)=>a+C[s.id].total,0);const desc=Number(P.desc)||0;
+  const padrao=Math.max(0,mensais.reduce((a,s)=>a+C[s.id].padrao,0)-desc);
+  const avalv=P.aval?(P.avalv!==""?Number(P.avalv):Number(cfg.aval)):0;
+  return {mensais,avulsos,sub,desc,mensal:Math.max(0,sub-desc),avalv,unico:avalv+avulsos.reduce((a,s)=>a+lineValue(s),0),
+    C,padrao,sessMes:mensais.reduce((a,s)=>a+C[s.id].sess,0),semana:mensais.reduce((a,s)=>a+C[s.id].semana,0)};
+}
+
+/* ---------- form ---------- */
+function renderSvcForm(){
+  $("svcList").innerHTML=SERVICES.map(s=>{const it=P.itens[s.id];return `
+  <div class="svc">
+    <input type="checkbox" id="s-on-${s.id}" ${it.on?"checked":""} aria-label="${esc(s.nome)}">
+    <label for="s-on-${s.id}" class="nm" style="color:var(--ink);font-size:14px;flex-direction:row"><span class="dot" style="background:${s.cor}"></span>${esc(s.nome)}</label>
+    <span class="val" id="s-val-${s.id}"></span>
+    <div class="more" id="s-more-${s.id}" ${it.on?"":"hidden"}>
+      ${s.avulso?`<span class="status" style="align-self:center">valor único</span>`:`<div class="days" role="group" aria-label="Dias da semana">${[1,2,3,4,5,6].map(w=>`<button type="button" data-svc="${s.id}" data-wd="${w}" aria-pressed="${normItem(it).dias.includes(w)}">${WD[w]}</button>`).join("")}</div>
+      <select id="s-pd-${s.id}" aria-label="Sessões por dia">${[1,2,3,4].map(n=>`<option value="${n}" ${+it.porDia===n?"selected":""}>${n} por dia</option>`).join("")}</select>`}
+      <input id="s-valor-${s.id}" type="number" min="0" step="5" placeholder="${s.avulso?"Valor":"R$/sessão"} (${brl(unitPrice(s.id))})" value="${esc(it.valor)}" aria-label="Valor por sessão personalizado">
+      ${s.avulso?"":`<span class="calc" id="s-calc-${s.id}"></span>`}
+      <input id="s-obs-${s.id}" style="grid-column:1 / 3" placeholder="Observação (ex.: atendimento na escola)" value="${esc(it.obs)}" aria-label="Observação">
+    </div>
+  </div>`}).join("");
+  SERVICES.forEach(s=>{
+    $("s-on-"+s.id).addEventListener("change",e=>{P.itens[s.id].on=e.target.checked;$("s-more-"+s.id).hidden=!e.target.checked;update()});
+    if(!s.avulso)$("s-pd-"+s.id).addEventListener("change",e=>{P.itens[s.id].porDia=+e.target.value;update()});
+    $("s-valor-"+s.id).addEventListener("input",e=>{P.itens[s.id].valor=e.target.value;update()});
+    $("s-obs-"+s.id).addEventListener("input",e=>{P.itens[s.id].obs=e.target.value;update()});
+  });
+}
+const FMAP={"f-mes":"mes","f-folgas":"folgas","f-crianca":"crianca","f-idade":"idade","f-resp":"resp","f-tel":"tel","f-email":"email","f-obj":"obj","f-avalv":"avalv","f-desc":"desc","f-num":"numero","f-data":"data"};
+$("svcList").addEventListener("click",e=>{const b=e.target.closest("button[data-wd]");if(!b)return;const it=normItem(P.itens[b.dataset.svc]);const w=+b.dataset.wd;
+  it.dias=it.dias.includes(w)?it.dias.filter(x=>x!==w):it.dias.concat(w).sort();b.setAttribute("aria-pressed",it.dias.includes(w));update()});
+function fillForm(){
+  Object.entries(FMAP).forEach(([id,k])=>{$(id).value=P[k]??""});
+  $("f-aval").checked=!!P.aval;$("f-avalv").placeholder=brl(cfg.aval);
+  if(!P.numero){P.numero=nextNumber();$("f-num").value=P.numero}
+  renderSvcForm();
+}
+Object.entries(FMAP).forEach(([id,k])=>$(id).addEventListener("input",e=>{P[k]=e.target.value;update()}));
+$("f-aval").addEventListener("change",e=>{P.aval=e.target.checked;update()});
+
+/* ---------- document ---------- */
+function wordmark(size){
+  return `<div class="wm"><img src="${cfg.logo||LOGO}" alt="Evolver — Centro de Desenvolvimento Infanto-Juvenil" style="height:${size}px;width:auto"></div>`;
+}
+function head(){return `<div class="phead">${wordmark(44)}<div class="meta">Proposta ${esc(P.numero)} · Emitida em ${fmtDate(P.data)} · Válida até ${fmtDate(addDays(P.data,cfg.valid))}</div></div>`}
+function foot(n){return `<div class="pfoot"><span>${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj}<br>${esc(cfg.end)}</span><b>PROPOSTA DE PLANO TERAPÊUTICO · ${n}</b></div>`}
+function nomeCrianca(){return (P.crianca||"").trim()||"sua criança"}
+
+function hubSVG(){
+  let sel=selected().filter(s=>!s.avulso);const label=sel.length>=2?"Neste plano":"Nossas especialidades";
+  if(sel.length<2)sel=SERVICES.filter(s=>!s.avulso).slice(0,6);
+  const W=300,H=260,cx=150,cy=128,R=96,n=sel.length;
+  const pts=sel.map((s,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return {s,x:cx+R*Math.cos(a),y:cy+R*Math.sin(a)}});
+  let lines="";for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)lines+=`<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[j].x}" y2="${pts[j].y}" stroke="#C9D4E6" stroke-width="1.2" stroke-dasharray="3 4"/>`;
+  pts.forEach(p=>lines+=`<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#9FB6DA" stroke-width="1.6"/>`);
+  const nodes=pts.map(p=>{const short=p.s.nome.replace("Psicologia ","").replace("Terapia ","T. ").replace("Integração ","Integr. ");
+    const ty=p.y<cy-10?p.y-20:p.y+30;return `<circle cx="${p.x}" cy="${p.y}" r="12" fill="${p.s.cor}"/><text x="${p.x}" y="${ty}" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11.5" font-weight="700" fill="#1B2A4E">${esc(short)}</text>`}).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Equipe integrada em torno da criança">
+    ${lines}<circle cx="${cx}" cy="${cy}" r="40" fill="#1B2A4E"/><text x="${cx}" y="${cy-3}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="13" fill="#fff">Criança</text><text x="${cx}" y="${cy+13}" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="#DCE6F7">e família</text>${nodes}
+    <text x="${W/2}" y="${H-4}" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" letter-spacing="1.5" font-weight="700" fill="#5E6780">${label.toUpperCase()}</text></svg>`;
+}
+
+function buildPages(){
+  const T=totals();const crianca=nomeCrianca();const validAte=fmtDate(addDays(P.data,cfg.valid));
+  const pages=[];
+  // 1 cover
+  pages.push(`<div class="page cover"><div class="band"><div class="growth">
+    <i style="height:80px;background:#EE1D23"></i><i style="height:140px;background:#E2A924"></i><i style="height:210px;background:#06A554"></i><i style="height:290px;background:#00AEEF"></i></div></div>
+    <div class="inC">${wordmark(118)}
+      <h1>Proposta de Plano Terapêutico</h1>
+      <p class="for">Preparada para ${P.resp?`<b>${esc(P.resp)}</b>, responsável por `:"a família de "}<b>${esc(crianca)}</b>.</p>
+      <div style="position:relative;flex:1"><div class="toc" style="top:auto;margin-top:0;padding-top:0;position:absolute;inset:auto 0 40px 0"><div><b>Quem somos</b>Nossa história e por que escolher a Evolver.</div><div><b>Como trabalhamos</b>O ciclo de avaliação, plano e evolução — com a equipe integrada.</div><div><b>Sua proposta</b>Terapias, frequência, investimento e próximos passos.</div></div></div>
+      <div class="meta"><div><span>Proposta</span><b>${esc(P.numero)}</b></div><div><span>Emitida em</span><b>${fmtDate(P.data)}</b></div><div><span>Válida até</span><b>${validAte}</b></div><div><span>Contato</span><b>${esc(cfg.whats)}</b></div></div>
+      <p class="tag">${EMPRESA.site} · ${EMPRESA.insta} · Belém/PA</p>
+    </div></div>`);
+  // 2 carta + quem somos
+  pages.push(`<div class="page">${head()}<div class="in">
+    <div><div class="eyebrow">Apresentação</div><h2 class="ptitle">Olá${P.resp?", "+esc(P.resp.split(" ")[0]):""}!</h2></div>
+    <p class="lead">É uma alegria apresentar esta proposta para o cuidado de <b>${esc(crianca)}</b>. Mais do que um orçamento, este documento mostra quem somos, como trabalhamos e por que acreditamos que cada criança evolui melhor quando família e equipe caminham juntas.</p>
+    <div class="quote">“Evolver significa evolução.”<small>Cada criança tem o seu ritmo — o nosso trabalho é respeitá-lo e fazê-lo avançar.</small></div>
+    <div><div class="eyebrow">Quem somos</div><h3 class="sec" style="margin-top:4px">Um centro feito por quem vive o desenvolvimento atípico de perto</h3></div>
+    <p>A Evolver é um centro de desenvolvimento infanto-juvenil em Belém/PA, especializado em crianças e adolescentes autistas e neurodivergentes. Fomos fundados pela psicóloga <b>Hellen Rodrigues</b>, que também é mãe de uma criança autista — e isso muda tudo: conhecemos por dentro as dúvidas, o cansaço e as conquistas de cada família.</p>
+    <p>Reunimos em um só lugar as principais especialidades do desenvolvimento infantil, trabalhando com terapias baseadas em evidências, um plano individualizado para cada criança e a família no centro do cuidado.</p>
+    <div><div class="eyebrow" style="margin-bottom:8px">Nossas especialidades</div><div class="chips">${SERVICES.map(s=>`<span class="chip"><span class="dot" style="background:${s.cor}"></span>${esc(s.nome)}</span>`).join("")}</div></div>
+  </div>${foot(2)}</div>`);
+  // 3 diferenciais
+  const feats=[
+   ["Tudo em um só lugar","Psicologia ABA, fonoaudiologia, terapia ocupacional e demais especialidades sob o mesmo teto — menos deslocamento para a família, mais integração entre os terapeutas."],
+   ["Plano individualizado","Nenhuma criança recebe um pacote pronto. O plano nasce da avaliação e é desenhado a partir dos objetivos de ${esc(crianca)} e da rotina da família."],
+   ["Terapias baseadas em evidências","Trabalhamos com a Análise do Comportamento Aplicada (ABA) e práticas reconhecidas cientificamente, com metas mensuráveis e registro de progresso."],
+   ["Equipe que conversa","Reuniões clínicas periódicas e supervisão ABA garantem que todos os terapeutas trabalhem na mesma direção."],
+   ["Família no centro","Orientação parental e devolutivas periódicas: você entende o que está sendo trabalhado e como apoiar em casa."],
+   ["Ponte com a escola","Mantemos contato com a escola para alinhar estratégias e levar os ganhos da terapia para a sala de aula."]
+  ];
+  pages.push(`<div class="page">${head()}<div class="in">
+    <div><div class="eyebrow">Diferenciais</div><h2 class="ptitle">Por que escolher a Evolver?</h2></div>
+    <p class="lead">Escolher onde seu filho vai fazer terapia é uma decisão de confiança. Estes são os compromissos que assumimos com cada família.</p>
+    <div class="grid2" style="margin-top:8px">${feats.map(f=>`<div class="feat"><h4><span class="bar"></span>${f[0]}</h4><p>${f[1]}</p></div>`).join("")}</div>
+    <div class="box" style="margin-top:auto"><b>Acolhimento de quem entende.</b> Fundada por uma psicóloga que também é mãe atípica, a Evolver trata cada família como gostaria de ser tratada: com escuta, clareza e presença.</div>
+  </div>${foot(3)}</div>`);
+  // 4 como trabalhamos
+  const steps=[
+   ["Acolhimento e escuta","Conversamos com a família para conhecer a história, a rotina, as preocupações e as expectativas em relação a "+esc(crianca)+"."],
+   ["Avaliação inicial","Os profissionais avaliam as habilidades e necessidades da criança em cada área envolvida. É a base de todo o plano."],
+   ["Plano Terapêutico Individualizado","Definimos metas claras e mensuráveis, as especialidades e a frequência semanal de cada terapia — é o que está detalhado nesta proposta."],
+   ["Intervenção integrada","As sessões acontecem com registro contínuo do desempenho. Cada terapeuta sabe o que os colegas estão trabalhando e reforça as mesmas metas."],
+   ["Reavaliação e devolutiva","Periodicamente medimos o progresso, apresentamos os resultados à família e ajustamos as metas para o próximo ciclo."]
+  ];
+  pages.push(`<div class="page">${head()}<div class="in">
+    <div><div class="eyebrow">Metodologia</div><h2 class="ptitle">Como trabalhamos pela evolução de ${esc(crianca)}</h2></div>
+    <p class="lead">O cuidado segue um ciclo contínuo: avaliar, planejar, intervir e medir. A cada volta, as metas ficam mais ambiciosas — porque a criança avançou.</p>
+    <div class="steps">${steps.map((s,i)=>`<div class="step"><span class="n" style="--c:${["#EE1D23","#E2A924","#06A554","#00AEEF","#1B2A4E"][i]}">${i+1}</span><div><h4>${s[0]}</h4><p>${s[1]}</p></div></div>`).join("")}</div>
+    ${P.obj?`<div class="box" style="margin-top:auto"><b>Objetivos iniciais conversados com a família</b><p style="margin-top:4px">${esc(P.obj)}</p></div>`:""}
+  </div>${foot(4)}</div>`);
+  // 5 multidisciplinar + comunicação
+  const comm=[
+   ["Reuniões clínicas periódicas","A equipe se reúne para discutir cada caso em conjunto, alinhar metas e decidir ajustes no plano."],
+   ["Supervisão ABA","Os terapeutas contam com supervisão clínica, garantindo qualidade técnica e consistência na aplicação das intervenções."],
+   ["Devolutivas aos pais","Encontros periódicos com a família para apresentar o plano, as metas e a evolução — com orientações práticas para casa."],
+   ["Contato com a escola","Articulação com a escola e o acompanhamento escolar, para que as estratégias se repitam em todos os ambientes da criança."]
+  ];
+  pages.push(`<div class="page">${head()}<div class="in">
+    <div><div class="eyebrow">Equipe integrada</div><h2 class="ptitle">Multidisciplinar de verdade</h2></div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p>Ter vários profissionais não basta — o que faz diferença é eles trabalharem <b>juntos</b>. Na Evolver, fonoaudióloga, terapeuta ocupacional e psicólogo não atuam em paralelo: compartilham as mesmas metas para ${esc(crianca)}.</p>
+        <p>Uma habilidade de comunicação trabalhada na fono é reforçada na sessão de ABA; uma estratégia sensorial da TO é usada por toda a equipe. Assim, a criança pratica o mesmo objetivo várias vezes por semana, em contextos diferentes — e a evolução acontece mais rápido e de forma mais sólida.</p>
+      </div>${hubSVG()}</div>
+    <div><div class="eyebrow">Comunicação</div><h3 class="sec" style="margin-top:4px">Como nossa equipe se comunica</h3></div>
+    <div class="comm">${comm.map(c=>`<div><h4>${c[0]}</h4><p>${c[1]}</p></div>`).join("")}</div>
+  </div>${foot(5)}</div>`);
+  // 6 proposta comercial
+  const mes=monthLabel();
+  const rows=T.mensais.map(s=>{const it=P.itens[s.id],c=T.C[s.id];
+    const dias=c.per.map(p=>WD[p.wd]).join(", ")||"—";const datas=c.per.flatMap(p=>p.counted).sort().map(x=>x.slice(8)).join(", ");
+    return `<tr><td><b>${esc(s.nome)}</b><small>${dias}${it.porDia>1?` · ${it.porDia} sessões por dia`:""}${it.obs?` · ${esc(it.obs)}`:""}</small>${datas?`<small>Dias considerados: ${datas}</small>`:""}</td><td class="c">${c.sess}</td><td class="r">${brl(c.vs)}</td><td class="r">${brl(c.total)}</td></tr>`}).join("")
+    ||`<tr><td colspan="4" class="muted">Selecione as terapias do plano.</td></tr>`;
+  const unicos=[];if(P.aval)unicos.push(["Avaliação inicial","Antecede o início das terapias",T.avalv]);
+  T.avulsos.forEach(s=>unicos.push([s.nome,P.itens[s.id].obs||"Valor único",lineValue(s)]));
+  const exMap={},fives={};T.mensais.forEach(s=>T.C[s.id].per.forEach(p=>{p.excl.forEach(x=>exMap[x.d]=x.nm);if(p.five)fives[p.wd]=1}));
+  const exList=Object.keys(exMap).sort().map(d=>`${fmtDate(d).slice(0,5)} (${esc(exMap[d])})`);
+  const fiveList=Object.keys(fives).map(w=>WDL[w]);
+  const notes=[`<li><b>Mês de referência:</b> ${mes}. O valor é calculado pelas sessões que cabem no calendário do mês × valor da sessão, por isso pode variar de um mês para outro.</li>`];
+  if(exList.length)notes.push(`<li><b>Sem atendimento (não cobrados):</b> ${exList.join(", ")}.</li>`);
+  if(fiveList.length)notes.push(`<li><b>Mês de 5 semanas:</b> ${mes} tem 5 ${fiveList.join(" e ")}. Este orçamento considera o padrão de 4 sessões por dia da semana; o valor pode ser ajustado caso a 5ª semana seja atendida.</li>`);
+  notes.push(`<li><b>Mês padrão</b> (4 semanas, sem feriados): ${brl(T.padrao)}.</li>`);
+  pages.push(`<div class="page">${head()}<div class="in" style="gap:14px">
+    <div><div class="eyebrow">Proposta · ${mes}</div><h2 class="ptitle">Investimento no plano de ${esc(crianca)}</h2></div>
+    <div class="kv">
+      <div><span>Criança</span><b>${esc(P.crianca||"—")}</b></div><div><span>Idade</span><b>${esc(P.idade||"—")}</b></div><div><span>Responsável</span><b>${esc(P.resp||"—")}</b></div>
+      <div><span>WhatsApp</span><b>${esc(P.tel||"—")}</b></div><div><span>E-mail</span><b>${esc(P.email||"—")}</b></div><div><span>Proposta</span><b>${esc(P.numero)}</b></div>
+    </div>
+    <table class="t"><thead><tr><th>Terapia e dias</th><th class="c">Sessões no mês</th><th class="r">Valor/sessão</th><th class="r">Total</th></tr></thead>
+    <tbody>${rows}
+      ${T.desc?`<tr class="sub"><td colspan="3">Subtotal</td><td class="r">${brl(T.sub)}</td></tr><tr><td colspan="3">Desconto</td><td class="r">− ${brl(T.desc)}</td></tr>`:""}
+      <tr class="tot"><td>Investimento em ${mes}</td><td class="c">${T.sessMes}</td><td></td><td class="r">${brl(T.mensal)}</td></tr></tbody></table>
+    ${unicos.length?`<table class="t"><thead><tr><th>Investimento único</th><th>Observação</th><th class="r">Valor</th></tr></thead><tbody>${unicos.map(u=>`<tr><td><b>${esc(u[0])}</b></td><td>${esc(u[1])}</td><td class="r">${brl(u[2])}</td></tr>`).join("")}</tbody></table>`:""}
+    <div class="box"><b>Como o valor foi calculado</b><ul>${notes.join("")}</ul></div>
+  </div>${foot(6)}</div>`);
+  // 7 condições + aceite
+  const conds=String(cfg.cond||"").split("\n").map(s=>s.trim()).filter(Boolean);
+  pages.push(`<div class="page">${head()}<div class="in">
+    <div><div class="eyebrow">Próximos passos</div><h2 class="ptitle">Condições e aceite</h2></div>
+    <div class="box"><b>Condições comerciais</b>
+      <ul><li><b>Forma de pagamento:</b> ${esc(cfg.pag)}</li><li><b>Vencimento:</b> ${esc(cfg.venc)}</li><li><b>Validade:</b> condições válidas até <b>${validAte}</b> (${cfg.valid} dias a partir da emissão).</li></ul></div>
+    <div class="box"><b>Condições gerais</b><ol>${conds.map(c=>`<li>${esc(c)}</li>`).join("")}</ol></div>
+    <div><h3 class="sec">Para começar</h3><p style="margin-top:6px">Responda esta proposta pelo WhatsApp ou assine abaixo. Em seguida, agendamos a avaliação inicial e enviamos o contrato de prestação de serviços.</p></div>
+    <table class="t"><thead><tr><th colspan="2">Canais de atendimento</th></tr></thead><tbody>
+      <tr><td style="width:30%"><b>WhatsApp</b></td><td>${esc(cfg.whats)}</td></tr>
+      <tr><td><b>E-mail</b></td><td>${esc(cfg.mail)}</td></tr>
+      <tr><td><b>Endereço</b></td><td>${esc(cfg.end)}</td></tr>
+      <tr><td><b>Site e redes</b></td><td>${EMPRESA.site} · Instagram ${EMPRESA.insta}</td></tr></tbody></table>
+    <p class="muted">Declaro que li e estou de acordo com esta proposta (${esc(P.numero)}) para ${esc(crianca)}.</p>
+    <div class="sign"><div><b>${esc(P.resp||"Responsável")}</b><span>Responsável pela criança</span><span>Data: ____/____/______</span></div>
+      <div><b>${esc(cfg.ass)}</b><span>${esc(cfg.cargo)} · ${EMPRESA.razao}</span><span>CNPJ ${EMPRESA.cnpj}</span></div></div>
+  </div>${foot(7)}</div>`);
+  return pages.join("");
+}
+
+/* ---------- preview scaling ---------- */
+function fit(){const wrap=$("previewWrap"),pg=$("pages");const avail=wrap.clientWidth;const s=Math.min(1,(avail-4)/794);pg.style.zoom=s}
+let tmr=null;
+function update(){
+  const T=totals();$("sumTotal").textContent=brl(T.mensal);
+  SERVICES.forEach(s=>{const el=$("s-val-"+s.id);if(!el)return;if(!P.itens[s.id].on){el.textContent="";return}const c=calcItem(s);el.textContent=brl(c.total);
+    const ce=$("s-calc-"+s.id);if(ce){const ex=c.per.flatMap(p=>p.excl.map(x=>fmtDate(x.d).slice(0,5)));const fv=c.per.filter(p=>p.five).map(p=>WD[p.wd]);
+      ce.textContent=c.per.length?`${c.sess} sessões × ${brl(c.vs)}`+(ex.length?` · sem atendimento: ${ex.join(", ")}`:"")+(fv.length?` · 5ª ${fv.join("/")} não contada`:""):"Escolha os dias da semana."}});
+  $("sumLbl").textContent="Investimento em "+monthLabel();
+  $("exNote").hidden=!!cfg.sessaoConfigurado;
+  clearTimeout(tmr);tmr=setTimeout(()=>{$("pages").innerHTML=buildPages();fit();ls.set("ev_draft",P)},120);
+}
+window.addEventListener("resize",fit);
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));
+  document.querySelectorAll("[data-panel]").forEach(p=>p.hidden=p.dataset.panel!==b.dataset.t);
+  if(b.dataset.t==="cfg")fillCfg();
+}));
+
+/* ---------- settings ---------- */
+function fillCfg(){
+  $("facList").innerHTML=FAC.map(([k,n])=>`<label class="chk"><input type="checkbox" id="fac-${k}" ${(cfg.fac||{})[k]?"checked":""}>${n}</label>`).join("");$("c-rec").value=cfg.rec||"";
+  $("priceList").innerHTML=SERVICES.map(s=>`<label style="flex-direction:row;align-items:center;justify-content:space-between;gap:10px"><span style="display:flex;gap:8px;align-items:center;color:var(--ink)"><span class="dot" style="background:${s.cor}"></span>${esc(s.nome)}${s.avulso?" (valor único)":""}</span><input id="p-${s.id}" type="number" min="0" step="5" style="width:120px" value="${unitPrice(s.id)}"></label>`).join("");
+  $("c-aval").value=cfg.aval;$("c-pag").value=cfg.pag;$("c-venc").value=cfg.venc;$("c-valid").value=cfg.valid;$("c-cond").value=cfg.cond;
+  $("c-ass").value=cfg.ass;$("c-cargo").value=cfg.cargo;$("c-whats").value=cfg.whats;$("c-mail").value=cfg.mail;$("c-end").value=cfg.end;
+}
+$("bCfg").addEventListener("click",async()=>{
+  cfg.precoSessao=Object.assign({},cfg.precoSessao);SERVICES.forEach(s=>cfg.precoSessao[s.id]=Number($("p-"+s.id).value)||0);
+  cfg.fac=Object.fromEntries(FAC.map(([k])=>[k,$("fac-"+k).checked]));cfg.rec=$("c-rec").value;
+  Object.assign(cfg,{aval:Number($("c-aval").value)||0,pag:$("c-pag").value,venc:$("c-venc").value,valid:Number($("c-valid").value)||15,cond:$("c-cond").value,
+    ass:$("c-ass").value,cargo:$("c-cargo").value,whats:$("c-whats").value,mail:$("c-mail").value,end:$("c-end").value,configurado:true,sessaoConfigurado:true});
+  await saveCfg("Configurações salvas.");
+});
+async function saveCfg(msg){
+  ls.set("ev_cfg",cfg);
+  try{await api("saveConfig",{config:cfg});$("cfgStatus").textContent=msg+" Valem para toda a equipe."}
+  catch(e){$("cfgStatus").textContent=e.code==="apenas_admin"?"Só o código de administrador pode salvar configurações.":"Não foi possível salvar ("+(e.code||e.message||"erro de conexão")+")."}
+  $("f-avalv").placeholder=brl(cfg.aval);renderSvcForm();update();
+}
+
+/* ---------- history ---------- */
+function renderHist(){
+  const el=$("histList");if(!history.length){el.innerHTML='<p class="status">Nenhuma proposta registrada ainda.</p>';return}
+  el.innerHTML=history.slice().sort((a,b)=>(b.criadoEm||"").localeCompare(a.criadoEm||"")).map(h=>`<div class="it"><b>${esc(h.numero)} · ${esc(h.crianca||"—")}</b><button class="btn" data-open="${esc(h.numero)}">Abrir</button><small>${fmtDate(h.data)} · ${esc(h.resp||"")} · ${brl(h.mensal)}/mês</small></div>`).join("");
+  el.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>{const h=history.find(x=>x.numero===b.dataset.open);if(!h)return;
+    P=JSON.parse(JSON.stringify(h.proposta));fillForm();update();$("tab-nova").click();$("status").textContent="Proposta "+h.numero+" carregada."}));
+}
+$("bSave").addEventListener("click",async()=>{
+  if(!P.crianca.trim()){$("status").textContent="Preencha o nome da criança antes de registrar.";return}
+  const T=totals();const rec={numero:P.numero,crianca:P.crianca,resp:P.resp,data:P.data,mensal:T.mensal,criadoEm:new Date().toISOString(),proposta:JSON.parse(JSON.stringify(P))};
+  const id=P.numero.replace(/[^\w-]/g,"_");
+  history=history.filter(h=>h.numero!==P.numero).concat(rec);renderHist();
+  $("status").textContent="Registrando…";
+  try{await api("saveProposal",{rec});$("status").textContent="Proposta "+P.numero+" registrada no histórico da equipe."}
+  catch(e){$("status").textContent="Não foi possível registrar ("+(e.code||e.message||"erro de conexão")+"). Tente de novo."}
+});
+$("bNew").addEventListener("click",()=>{P=blankProposal(false);P.numero=nextNumber();fillForm();update();$("status").textContent="Nova proposta em branco."});
+
+/* ---------- PDF ---------- */
+$("bPdf").addEventListener("click",async()=>{
+  const btn=$("bPdf");btn.disabled=true;$("status").textContent="Gerando PDF…";
+  try{
+    if(!window.html2canvas||!window.jspdf)throw{message:"bibliotecas de PDF não carregaram"};
+    await document.fonts.ready;
+    const host=$("exportHost");host.innerHTML=buildPages();
+    const pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4",compress:true});
+    const pages=host.querySelectorAll(".page");
+    for(let i=0;i<pages.length;i++){
+      $("status").textContent=`Gerando PDF… página ${i+1} de ${pages.length}`;
+      const c=await html2canvas(pages[i],{scale:2,backgroundColor:"#ffffff",useCORS:true,logging:false,width:794,height:1123,windowWidth:794});
+      if(i)pdf.addPage();pdf.addImage(c.toDataURL("image/jpeg",0.9),"JPEG",0,0,210,297);
+    }
+    host.innerHTML="";
+    const nome=`Proposta ${P.numero} - ${(P.crianca||"Evolver").replace(/[\\/:*?"<>|]/g,"")}.pdf`;
+    pdf.save(nome);
+    $("status").textContent="PDF salvo: "+nome;
+  }catch(e){
+    $("status").textContent=("Não foi possível gerar o PDF: "+(e&&e.message||e));
+  }finally{btn.disabled=false}
+});
+
+/* ---------- boot ---------- */
+const localCfg=ls.get("ev_cfg");if(localCfg)cfg=Object.assign({},DEFAULT_CFG,localCfg);
+fillForm();update();renderHist();
+$("gateLogo").src=LOGO;
+async function load(){
+  const j=await api("load");isAdmin=!!j.admin;
+  if(j.config){cfg=Object.assign({},DEFAULT_CFG,j.config);ls.set("ev_cfg",cfg)}
+  history=j.propostas||[];renderHist();
+  const seq=n=>{const m=/EV-(\d{4})-(\d+)/.exec(n||"");return m?+m[1]*1e5+ +m[2]:0};
+  const own=history.find(h=>h.numero===P.numero);
+  if(!P.numero||(own&&own.crianca!==P.crianca)||(!own&&seq(P.numero)<seq(nextNumber()))){P.numero=nextNumber();$("f-num").value=P.numero}
+  $("whoTxt").textContent=isAdmin?"Administrador":"Equipe";$("cfgLock").hidden=isAdmin;$("bCfg").disabled=!isAdmin;
+  $("f-avalv").placeholder=brl(cfg.aval);renderSvcForm();update();
+}
+function showGate(msg){$("gate").hidden=false;$("gateStatus").textContent=msg||"";$("gateCode").focus()}
+$("gateForm").addEventListener("submit",async e=>{e.preventDefault();$("gateBtn").disabled=true;$("gateStatus").textContent="Verificando…";
+  ls.set("ev_code",$("gateCode").value.trim());
+  try{await load();$("gate").hidden=true;$("gateCode").value=""}
+  catch(err){ls.set("ev_code","");$("gateStatus").textContent=err.code==="codigo_invalido"?"Código incorreto.":"Sem conexão com a planilha. Verifique a internet e tente de novo."}
+  finally{$("gateBtn").disabled=false}});
+$("bLogout").addEventListener("click",()=>{ls.set("ev_code","");history=[];renderHist();showGate("Você saiu.")});
+if(API_URL.startsWith("COLE_")){showGate("Falta configurar a URL do Apps Script no arquivo index.html (linha API_URL).");$("gateBtn").disabled=true}
+else if(!ls.get("ev_code"))showGate();
+else load().catch(err=>showGate(err.code==="codigo_invalido"?"Código alterado. Entre novamente.":"Sem conexão com a planilha. Tente novamente."));
+})();
+</script>
+</body>
+</html>
